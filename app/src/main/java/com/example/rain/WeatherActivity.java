@@ -223,7 +223,7 @@ public class WeatherActivity extends AppCompatActivity {
         carWashText.setText(carWash);
         sportText.setText(sport);
         uvText.setText(uv);
-        Toast.makeText(WeatherActivity.this,"111",Toast.LENGTH_LONG).show();
+        //Toast.makeText(WeatherActivity.this,"111",Toast.LENGTH_LONG).show();
         weatherLayout.setVisibility(View.VISIBLE);
         Intent intent = new Intent(this,AntoUpdateService.class);
         startService(intent);
