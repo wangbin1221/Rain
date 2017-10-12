@@ -1,5 +1,6 @@
 package com.example.rain;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
@@ -224,6 +225,8 @@ public class WeatherActivity extends AppCompatActivity {
         uvText.setText(uv);
         Toast.makeText(WeatherActivity.this,"111",Toast.LENGTH_LONG).show();
         weatherLayout.setVisibility(View.VISIBLE);
+        Intent intent = new Intent(this,AntoUpdateService.class);
+        startService(intent);
         /*Intent intent = new Intent(this, AutoUpdateService.class);
         startService(intent);*/
     }
