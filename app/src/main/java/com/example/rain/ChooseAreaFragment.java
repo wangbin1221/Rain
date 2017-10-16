@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 import com.example.rain.db.City;
 import com.example.rain.db.County;
 import com.example.rain.db.Province;
+import com.example.rain.gson.Weather;
 import com.example.rain.util.HttpUtil;
 import com.example.rain.util.Utility;
 
@@ -118,21 +120,29 @@ public class ChooseAreaFragment extends Fragment {
                     if (getActivity() instanceof MainActivity) {
                         Intent intent = new Intent(getActivity(), WeatherActivity.class);
                         intent.putExtra("weather_id", weatherId);
-                        Toast.makeText(getActivity(),"Main",Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getActivity(),"Main",Toast.LENGTH_LONG).show();
                         startActivity(intent);
                         getActivity().finish();
                     } else if (getActivity() instanceof WeatherActivity) {
-                        Toast.makeText(getActivity(),"Frag",Toast.LENGTH_LONG).show();
-                        WeatherActivity activity = (WeatherActivity) getActivity();
+                        //Toast.makeText(getActivity(),"Frag",Toast.LENGTH_LONG).show();
+                       WeatherActivity activity = (WeatherActivity) getActivity();
                         activity.drawerLayout.closeDrawers();
                         activity.swipeRefresh.setRefreshing(true);
                         activity.requestWeather(weatherId);
+                      /*  Intent i = new Intent(getActivity(),WeatherActivity.class);
+                        i.putExtra("weather_id",weatherId);
+                        startActivity(i);
+                        getActivity().finish();
+*/
+                        //Toast.makeText(activity,"123",Toast.LENGTH_LONG).show();
+
+                       /* Intent i = new Intent(activity,WeatherActivity.class);
+                        startActivity(i);*/
+
+
                     }
-                    Intent intent = new Intent(getActivity(),WeatherActivity.class);
-                    intent.putExtra("weather_id",weatherId);
-                    //Toast.makeText(getContext(),weatherId,Toast.LENGTH_LONG).show();
-                    startActivity(intent);
-                    getActivity().finish();
+
+
                 }
             }
         });

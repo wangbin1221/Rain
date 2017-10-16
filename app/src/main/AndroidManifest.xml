@@ -19,7 +19,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".TestActivity" />
-        <activity android:name=".WeatherActivity" />
+        <activity android:name=".WeatherActivity"
+           />
 
         <service
             android:name=".AntoUpdateService"

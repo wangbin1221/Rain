@@ -10,6 +10,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -67,9 +68,12 @@ public class WeatherActivity extends AppCompatActivity {
 
     private Button navButton;
 
+    private  ImageView dear;
 
+    private static final String TAG = "WeatherActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG,"sdaasdadadad");
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >=21){
             View decorView = getWindow().getDecorView();
@@ -95,6 +99,7 @@ public class WeatherActivity extends AppCompatActivity {
         uvText = (TextView)findViewById(R.id.uv_text);
         bingPicImg = (ImageView)findViewById(R.id.bing_pic_img);
         navButton = (Button)findViewById(R.id.uv_button);
+        dear = (ImageView)findViewById(R.id.formydear);
 
        swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
@@ -120,16 +125,18 @@ public class WeatherActivity extends AppCompatActivity {
             Weather weather = Utility.handleWeatherResponse(weatherString);
             mWeatherId = weather.basic.weatgerId;
             showWeatherInfo(weather);
+
         } else {
             // 无缓存时去服务器查询天气
              mWeatherId = getIntent().getStringExtra("weather_id");
-            Toast.makeText(WeatherActivity.this,mWeatherId,Toast.LENGTH_LONG).show();
+            //Toast.makeText(WeatherActivity.this,mWeatherId,Toast.LENGTH_LONG).show();
             weatherLayout.setVisibility(View.INVISIBLE);
             requestWeather(mWeatherId);
         }
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
             @Override
             public void onRefresh() {
+              //  Toast.makeText(WeatherActivity.this,"检测到1",Toast.LENGTH_LONG).show();
                 requestWeather(mWeatherId);
             }
         });
@@ -150,6 +157,7 @@ public class WeatherActivity extends AppCompatActivity {
                             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
                             editor.putString("weather", responseText);
                             editor.apply();
+                            Toast.makeText(WeatherActivity.this,"切换成功",Toast.LENGTH_LONG).show();
                             showWeatherInfo(weather);
                         } else {
                             Toast.makeText(WeatherActivity.this, "waiting...", Toast.LENGTH_SHORT).show();
@@ -173,17 +181,24 @@ public class WeatherActivity extends AppCompatActivity {
         });
         loadBingPic();
     }
+
+
+
+
     //=======================================================================
     public void showWeatherInfo(Weather weather) {
        // Toast.makeText(WeatherActivity.this,"111",Toast.LENGTH_LONG).show();
+       // weatherLayout.setVisibility(View.INVISIBLE);
         String cityName = weather.basic.city;
-        String updateTime = weather.basic.update.loc.split(" ")[1];
+        String updateTime ="天气发布时间: " +  weather.basic.update.loc.split(" ")[1] ;
         String degree = weather.now.tmp + "℃";
         String weatherInfo = weather.now.cond.txt;
         titleCity.setText(cityName);
         titleUpdateTime.setText(updateTime);
         degreeText.setText(degree);
         weatherInfoText.setText(weatherInfo);
+        //Log.e(TAG, "showWeatherInfo: " );
+        //Toast.makeText(WeatherActivity.this,cityName,Toast.LENGTH_LONG).show();//显示当前的天气
         forecastLayout.removeAllViews();
         forecast_daily_layout.removeAllViews();
         for (DailyForecast forecast : weather.daily_forecast) {
@@ -225,8 +240,13 @@ public class WeatherActivity extends AppCompatActivity {
         uvText.setText(uv);
         //Toast.makeText(WeatherActivity.this,"111",Toast.LENGTH_LONG).show();
         weatherLayout.setVisibility(View.VISIBLE);
-        Intent intent = new Intent(this,AntoUpdateService.class);
-        startService(intent);
+        //dear.setImageResource(R.drawable.jizihan);
+       String imageUrl = "http://10.0.2.2/dear.jpg";
+        new DownloadPho(dear).execute(imageUrl);
+        //weatherLayout.invalidate();
+        //Toast.makeText(WeatherActivity.this,cityName+"...",Toast.LENGTH_LONG).show();//显示当前天气
+        Intent intent1 = new Intent(this,AntoUpdateService.class);
+        startService(intent1);
         /*Intent intent = new Intent(this, AutoUpdateService.class);
         startService(intent);*/
     }
