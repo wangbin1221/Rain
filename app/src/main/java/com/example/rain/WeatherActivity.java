@@ -1,9 +1,13 @@
 package com.example.rain;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -69,8 +73,37 @@ public class WeatherActivity extends AppCompatActivity {
     private Button navButton;
 
     private  ImageView dear;
+    private boolean isBind;
 
     private static final String TAG = "WeatherActivity";
+
+    private GetLocationService.LocationBinder locationBinder;
+
+    private GetLocationService mservice;
+
+    private  ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+          mservice = ((GetLocationService.LocationBinder) service).getService();
+
+            mservice.registerListener(new LocationListener() {
+                @Override
+                public void callback() {
+                    //Toast.makeText(getApplicationContext(),"dasd",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(),mservice.GpsId,Toast.LENGTH_LONG).show();
+                }
+            });
+           /* String text = locationBinder.getLocation();
+            Toast.makeText(getApplicationContext(),text,Toast.LENGTH_LONG).show();
+            locationBinder.test();*/
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG,"sdaasdadadad");
@@ -100,11 +133,11 @@ public class WeatherActivity extends AppCompatActivity {
         bingPicImg = (ImageView)findViewById(R.id.bing_pic_img);
         navButton = (Button)findViewById(R.id.uv_button);
         dear = (ImageView)findViewById(R.id.formydear);
-
        swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
        // navButton = (Button) findViewById(R.id.nav_button);
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherString = prefs.getString("weather", null);
         String bingPic = prefs.getString("bing_pic",null);
@@ -247,8 +280,8 @@ public class WeatherActivity extends AppCompatActivity {
         //Toast.makeText(WeatherActivity.this,cityName+"...",Toast.LENGTH_LONG).show();//显示当前天气
         Intent intent1 = new Intent(this,AntoUpdateService.class);
         startService(intent1);
-        /*Intent intent = new Intent(this, AutoUpdateService.class);
-        startService(intent);*/
+       Intent bindIntent = new Intent(this,GetLocationService.class);
+        bindService(bindIntent,connection,BIND_AUTO_CREATE);
     }
     //==================================每日一图============================
     private void loadBingPic(){
