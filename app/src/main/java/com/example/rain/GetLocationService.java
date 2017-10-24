@@ -69,7 +69,7 @@ public class GetLocationService extends Service {
     public class  MyLocationListener implements BDLocationListener{
         @Override
         public void onReceiveLocation(BDLocation bdLocation) {
-            GpsId = bdLocation.getDistrict();
+            GpsId = bdLocation.getCity();
             if (mLocationListener!=null)
                 mLocationListener.callback();
             //Toast.makeText(getApplicationContext(),GpsId,Toast.LENGTH_LONG).show();

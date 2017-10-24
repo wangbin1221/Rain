@@ -2,6 +2,7 @@ package com.example.rain;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -12,6 +13,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,13 +27,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.rain.db.City;
+import com.example.rain.db.County;
 import com.example.rain.gson.DailyForecast;
 import com.example.rain.gson.HourlyForecast;
 import com.example.rain.gson.Weather;
 import com.example.rain.util.HttpUtil;
 import com.example.rain.util.Utility;
 
+import org.litepal.crud.DataSupport;
+
 import java.io.IOException;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -74,6 +81,9 @@ public class WeatherActivity extends AppCompatActivity {
 
     private  ImageView dear;
     private boolean isBind;
+    public String Gpsid;
+
+    private String mWeatherCity;
 
     private static final String TAG = "WeatherActivity";
 
@@ -90,7 +100,8 @@ public class WeatherActivity extends AppCompatActivity {
                 @Override
                 public void callback() {
                     //Toast.makeText(getApplicationContext(),"dasd",Toast.LENGTH_LONG).show();
-                    Toast.makeText(getApplicationContext(),mservice.GpsId,Toast.LENGTH_LONG).show();
+                    Gpsid = mservice.GpsId.split("市")[0];
+                    Toast.makeText(getApplicationContext(),Gpsid,Toast.LENGTH_LONG).show();
                 }
             });
            /* String text = locationBinder.getLocation();
@@ -157,6 +168,7 @@ public class WeatherActivity extends AppCompatActivity {
             // 有缓存时直接解析天气数据
             Weather weather = Utility.handleWeatherResponse(weatherString);
             mWeatherId = weather.basic.weatgerId;
+            mWeatherCity = weather.basic.city;
             showWeatherInfo(weather);
 
         } else {
@@ -166,13 +178,45 @@ public class WeatherActivity extends AppCompatActivity {
             weatherLayout.setVisibility(View.INVISIBLE);
             requestWeather(mWeatherId);
         }
-        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
+        /*swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
             @Override
             public void onRefresh() {
               //  Toast.makeText(WeatherActivity.this,"检测到1",Toast.LENGTH_LONG).show();
-                requestWeather(mWeatherId);
+                AlertDialog.Builder dialog = new AlertDialog.Builder(WeatherActivity.this);
+                if (mWeatherCity!=null) {
+                   if(!Gpsid.equals(mWeatherCity)){
+                       //AlertDialog.Builder dialog = new AlertDialog.Builder(WeatherActivity.this);
+                       dialog.setTitle("This is a dialog");
+                       dialog.setMessage("是否切换到当前城市");
+                       dialog.setCancelable(true);
+                       dialog.setPositiveButton("Ok",new DialogInterface.OnClickListener(){
+                           @Override
+                           public void onClick(DialogInterface dialog, int which) {
+                               List<City> cityList = DataSupport.where("cityName=?",Gpsid).find(City.class);
+                                String a  =String.valueOf(cityList.get(0).getId());
+                               List<County> countyList = DataSupport.where("cityId=?",a).find(County.class);
+                               String b = countyList.get(0).getWeatherId();
+                               mWeatherId = b;
+                               //requestWeather(mWeatherId);
+                              Toast.makeText(getApplicationContext(),String.valueOf(a),Toast.LENGTH_LONG).show();
+                               Toast.makeText(getApplicationContext(),String.valueOf(b),Toast.LENGTH_LONG).show();
+                           }
+                       });
+                       dialog.setNegativeButton("deny",new DialogInterface.OnClickListener(){
+                           @Override
+                           public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(getApplicationContext(),"您选择了不更新位置天气",Toast.LENGTH_LONG).show();
+                               //requestWeather(mWeatherId);
+                           }
+                       });
+                        dialog.show();
+                   }
+                   requestWeather(mWeatherId);
+               }
+                //requestWeather(mWeatherId);
+
             }
-        });
+        });*/
     }
 //https://free-api.heweather.com/v5/weather?city=CN101190402&key=bc0418b57b2d4918819d3974ac1285d9
 //https://free-api.heweather.com/x3/weather?city=CN101190401&key=bc0418b57b2d4918819d3974ac1285d9
